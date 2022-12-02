@@ -13,6 +13,7 @@ $res = $st->get_result();
 
 $r = $res->fetch_assoc();
 print "username: $r[username], card_id: $r[card_id]";
+
 ?>
 
     
