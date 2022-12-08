@@ -1,6 +1,4 @@
 <?php
-require_once "..lib/dbconnect.php";
-require_once "../lib/game_board.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
