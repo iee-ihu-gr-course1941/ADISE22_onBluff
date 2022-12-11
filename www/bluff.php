@@ -68,5 +68,13 @@ function handle_player($method, $p,$input){
     ;
 }
 
+function handle_status($method){
+    if($method == 'GET'){
+        show_status();
+    } else {
+        header('HTTP/1.1405 Method Not Allowed');
+    }
+}
+
 
 ?>
