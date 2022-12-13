@@ -23,6 +23,7 @@ DELIMITER //
 CREATE PROCEDURE `clean_board`()
 BEGIN
 DELETE FROM game_board;
+call start_new();
 END//
 DELIMITER ;
 
@@ -86,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `game_board_empty` (
 DROP TABLE IF EXISTS `game_status`;
 CREATE TABLE IF NOT EXISTS `game_status` (
   `status` enum('not active','initialized','started','ended','aborded') NOT NULL,
-  `p_turn` mediumtext DEFAULT NULL,
+  `p_turn` enum('A','B') DEFAULT NULL,
   `result` mediumtext DEFAULT NULL,
   `last_change` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -94,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `game_status` (
 -- Dumping data for table bluff.game_status: ~0 rows (approximately)
 /*!40000 ALTER TABLE `game_status` DISABLE KEYS */;
 INSERT INTO `game_status` (`status`, `p_turn`, `result`, `last_change`) VALUES
-	('not active', NULL, 'tnschridsfgd\r\n\r\n', '2022-11-29 04:46:28');
+	('started', 'A', NULL, '2022-12-13 13:12:15');
 /*!40000 ALTER TABLE `game_status` ENABLE KEYS */;
 
 -- Dumping structure for table bluff.hands
@@ -108,64 +109,65 @@ CREATE TABLE IF NOT EXISTS `hands` (
   `suit_text` char(8) DEFAULT NULL,
   `suit_color` char(5) DEFAULT NULL,
   `player_us` mediumtext DEFAULT NULL,
+  `turn_name` tinytext DEFAULT 'NTN',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for table bluff.hands: ~52 rows (approximately)
 /*!40000 ALTER TABLE `hands` DISABLE KEYS */;
-INSERT INTO `hands` (`id`, `value_tinyinit`, `value_text`, `value_symbol`, `suit_symbol`, `suit_text`, `suit_color`, `player_us`) VALUES
-	(1, 1, 'ace', 'A', '♥', 'hearts', 'red', 'takis'),
-	(2, 2, 'two', '2', '♥', 'hearts', 'red', 'thanos'),
-	(3, 3, 'three', '3', '♥', 'hearts', 'red', 'thanos'),
-	(4, 4, 'four', '4', '♥', 'hearts', 'red', 'thanos'),
-	(5, 5, 'five', '5', '♥', 'hearts', 'red', 'thanos'),
-	(6, 6, 'six', '6', '♥', 'hearts', 'red', 'takis'),
-	(7, 7, 'seven', '7', '♥', 'hearts', 'red', 'thanos'),
-	(8, 8, 'eight', '8', '♥', 'hearts', 'red', 'thanos'),
-	(9, 9, 'nine', '9', '♥', 'hearts', 'red', 'thanos'),
-	(10, 10, 'ten', '10', '♥', 'hearts', 'red', 'takis'),
-	(11, 11, 'jack', 'J', '♥', 'hearts', 'red', 'takis'),
-	(12, 12, 'queen', 'Q', '♥', 'hearts', 'red', 'takis'),
-	(13, 13, 'king', 'K', '♥', 'hearts', 'red', 'takis'),
-	(14, 1, 'ace', 'A', '♦', 'diamonds', 'red', 'takis'),
-	(15, 2, 'two', '2', '♦', 'diamonds', 'red', 'thanos'),
-	(16, 3, 'three', '3', '♦', 'diamonds', 'red', 'takis'),
-	(17, 4, 'four', '4', '♦', 'diamonds', 'red', 'takis'),
-	(18, 5, 'five', '5', '♦', 'diamonds', 'red', 'thanos'),
-	(19, 6, 'six', '6', '♦', 'diamonds', 'red', 'takis'),
-	(20, 7, 'seven', '7', '♦', 'diamonds', 'red', 'thanos'),
-	(21, 8, 'eight', '8', '♦', 'diamonds', 'red', 'takis'),
-	(22, 9, 'nine', '9', '♦', 'diamonds', 'red', 'thanos'),
-	(23, 10, 'ten', '10', '♦', 'diamonds', 'red', 'thanos'),
-	(24, 11, 'jack', 'J', '♦', 'diamonds', 'red', 'thanos'),
-	(25, 12, 'queen', 'Q', '♦', 'diamonds', 'red', 'takis'),
-	(26, 13, 'king', 'K', '♦', 'diamonds', 'red', 'takis'),
-	(27, 1, 'ace', 'A', '♣', 'clubs', 'black', 'thanos'),
-	(28, 2, 'two', '2', '♣', 'clubs', 'black', 'takis'),
-	(29, 3, 'three', '3', '♣', 'clubs', 'black', 'thanos'),
-	(30, 4, 'four', '4', '♣', 'clubs', 'black', 'takis'),
-	(31, 5, 'five', '5', '♣', 'clubs', 'black', 'thanos'),
-	(32, 6, 'six', '6', '♣', 'clubs', 'black', 'takis'),
-	(33, 7, 'seven', '7', '♣', 'clubs', 'black', 'takis'),
-	(34, 8, 'eight', '8', '♣', 'clubs', 'black', 'thanos'),
-	(35, 9, 'nine', '9', '♣', 'clubs', 'black', 'takis'),
-	(36, 10, 'ten', '10', '♣', 'clubs', 'black', 'thanos'),
-	(37, 11, 'jack', 'J', '♣', 'clubs', 'black', 'takis'),
-	(38, 12, 'queen', 'Q', '♣', 'clubs', 'black', 'takis'),
-	(39, 13, 'king', 'K', '♣', 'clubs', 'black', 'takis'),
-	(40, 1, 'ace', 'A', '♠', 'spades', 'black', 'takis'),
-	(41, 2, 'two', '2', '♠', 'spades', 'black', 'thanos'),
-	(42, 3, 'three', '3', '♠', 'spades', 'black', 'takis'),
-	(43, 4, 'four', '4', '♠', 'spades', 'black', 'takis'),
-	(44, 5, 'five', '5', '♠', 'spades', 'black', 'thanos'),
-	(45, 6, 'six', '6', '♠', 'spades', 'black', 'thanos'),
-	(46, 7, 'seven', '7', '♠', 'spades', 'black', 'takis'),
-	(47, 8, 'eight', '8', '♠', 'spades', 'black', 'thanos'),
-	(48, 9, 'nine', '9', '♠', 'spades', 'black', 'thanos'),
-	(49, 10, 'ten', '10', '♠', 'spades', 'black', 'takis'),
-	(50, 11, 'jack', 'J', '♠', 'spades', 'black', 'takis'),
-	(51, 12, 'queen', 'Q', '♠', 'spades', 'black', 'takis'),
-	(52, 13, 'king', 'K', '♠', 'spades', 'black', 'thanos');
+INSERT INTO `hands` (`id`, `value_tinyinit`, `value_text`, `value_symbol`, `suit_symbol`, `suit_text`, `suit_color`, `player_us`, `turn_name`) VALUES
+	(1, 1, 'ace', 'A', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(2, 2, 'two', '2', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(3, 3, 'three', '3', '♥', 'hearts', 'red', 'tnschr', 'B'),
+	(4, 4, 'four', '4', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(5, 5, 'five', '5', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(6, 6, 'six', '6', '♥', 'hearts', 'red', 'tnschr', 'B'),
+	(7, 7, 'seven', '7', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(8, 8, 'eight', '8', '♥', 'hearts', 'red', 'tnschr', 'B'),
+	(9, 9, 'nine', '9', '♥', 'hearts', 'red', 'tnschr', 'B'),
+	(10, 10, 'ten', '10', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(11, 11, 'jack', 'J', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(12, 12, 'queen', 'Q', '♥', 'hearts', 'red', 'tnschr', 'B'),
+	(13, 13, 'king', 'K', '♥', 'hearts', 'red', 'hdfloskjdhjf', 'A'),
+	(14, 1, 'ace', 'A', '♦', 'diamonds', 'red', 'hdfloskjdhjf', 'A'),
+	(15, 2, 'two', '2', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(16, 3, 'three', '3', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(17, 4, 'four', '4', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(18, 5, 'five', '5', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(19, 6, 'six', '6', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(20, 7, 'seven', '7', '♦', 'diamonds', 'red', 'hdfloskjdhjf', 'A'),
+	(21, 8, 'eight', '8', '♦', 'diamonds', 'red', 'hdfloskjdhjf', 'A'),
+	(22, 9, 'nine', '9', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(23, 10, 'ten', '10', '♦', 'diamonds', 'red', 'hdfloskjdhjf', 'A'),
+	(24, 11, 'jack', 'J', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(25, 12, 'queen', 'Q', '♦', 'diamonds', 'red', 'hdfloskjdhjf', 'A'),
+	(26, 13, 'king', 'K', '♦', 'diamonds', 'red', 'tnschr', 'B'),
+	(27, 1, 'ace', 'A', '♣', 'clubs', 'black', 'tnschr', 'B'),
+	(28, 2, 'two', '2', '♣', 'clubs', 'black', 'hdfloskjdhjf', 'A'),
+	(29, 3, 'three', '3', '♣', 'clubs', 'black', 'hdfloskjdhjf', 'A'),
+	(30, 4, 'four', '4', '♣', 'clubs', 'black', 'hdfloskjdhjf', 'A'),
+	(31, 5, 'five', '5', '♣', 'clubs', 'black', 'tnschr', 'B'),
+	(32, 6, 'six', '6', '♣', 'clubs', 'black', 'hdfloskjdhjf', 'A'),
+	(33, 7, 'seven', '7', '♣', 'clubs', 'black', 'tnschr', 'B'),
+	(34, 8, 'eight', '8', '♣', 'clubs', 'black', 'hdfloskjdhjf', 'A'),
+	(35, 9, 'nine', '9', '♣', 'clubs', 'black', 'tnschr', 'B'),
+	(36, 10, 'ten', '10', '♣', 'clubs', 'black', 'tnschr', 'B'),
+	(37, 11, 'jack', 'J', '♣', 'clubs', 'black', 'hdfloskjdhjf', 'A'),
+	(38, 12, 'queen', 'Q', '♣', 'clubs', 'black', 'hdfloskjdhjf', 'A'),
+	(39, 13, 'king', 'K', '♣', 'clubs', 'black', 'tnschr', 'B'),
+	(40, 1, 'ace', 'A', '♠', 'spades', 'black', 'hdfloskjdhjf', 'A'),
+	(41, 2, 'two', '2', '♠', 'spades', 'black', 'hdfloskjdhjf', 'A'),
+	(42, 3, 'three', '3', '♠', 'spades', 'black', 'hdfloskjdhjf', 'A'),
+	(43, 4, 'four', '4', '♠', 'spades', 'black', 'hdfloskjdhjf', 'A'),
+	(44, 5, 'five', '5', '♠', 'spades', 'black', 'tnschr', 'B'),
+	(45, 6, 'six', '6', '♠', 'spades', 'black', 'tnschr', 'B'),
+	(46, 7, 'seven', '7', '♠', 'spades', 'black', 'tnschr', 'B'),
+	(47, 8, 'eight', '8', '♠', 'spades', 'black', 'tnschr', 'B'),
+	(48, 9, 'nine', '9', '♠', 'spades', 'black', 'tnschr', 'B'),
+	(49, 10, 'ten', '10', '♠', 'spades', 'black', 'tnschr', 'B'),
+	(50, 11, 'jack', 'J', '♠', 'spades', 'black', 'hdfloskjdhjf', 'A'),
+	(51, 12, 'queen', 'Q', '♠', 'spades', 'black', 'hdfloskjdhjf', 'A'),
+	(52, 13, 'king', 'K', '♠', 'spades', 'black', 'tnschr', 'B');
 /*!40000 ALTER TABLE `hands` ENABLE KEYS */;
 
 -- Dumping structure for table bluff.playcards
@@ -179,64 +181,65 @@ CREATE TABLE IF NOT EXISTS `playcards` (
   `suit_text` char(8) DEFAULT NULL,
   `suit_color` char(5) DEFAULT NULL,
   `player_us` mediumtext DEFAULT NULL,
+  `turn_name` tinytext DEFAULT 'NTN',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table bluff.playcards: ~52 rows (approximately)
 /*!40000 ALTER TABLE `playcards` DISABLE KEYS */;
-INSERT INTO `playcards` (`id`, `value_tinyinit`, `value_text`, `value_symbol`, `suit_symbol`, `suit_text`, `suit_color`, `player_us`) VALUES
-	(1, 1, 'ace', 'A', '♥', 'hearts', 'red', 'NP'),
-	(2, 2, 'two', '2', '♥', 'hearts', 'red', 'NP'),
-	(3, 3, 'three', '3', '♥', 'hearts', 'red', 'NP'),
-	(4, 4, 'four', '4', '♥', 'hearts', 'red', 'NP'),
-	(5, 5, 'five', '5', '♥', 'hearts', 'red', 'NP'),
-	(6, 6, 'six', '6', '♥', 'hearts', 'red', 'NP'),
-	(7, 7, 'seven', '7', '♥', 'hearts', 'red', 'NP'),
-	(8, 8, 'eight', '8', '♥', 'hearts', 'red', 'NP'),
-	(9, 9, 'nine', '9', '♥', 'hearts', 'red', 'NP'),
-	(10, 10, 'ten', '10', '♥', 'hearts', 'red', 'NP'),
-	(11, 11, 'jack', 'J', '♥', 'hearts', 'red', 'NP'),
-	(12, 12, 'queen', 'Q', '♥', 'hearts', 'red', 'NP'),
-	(13, 13, 'king', 'K', '♥', 'hearts', 'red', 'NP'),
-	(14, 1, 'ace', 'A', '♦', 'diamonds', 'red', 'NP'),
-	(15, 2, 'two', '2', '♦', 'diamonds', 'red', 'NP'),
-	(16, 3, 'three', '3', '♦', 'diamonds', 'red', 'NP'),
-	(17, 4, 'four', '4', '♦', 'diamonds', 'red', 'NP'),
-	(18, 5, 'five', '5', '♦', 'diamonds', 'red', 'NP'),
-	(19, 6, 'six', '6', '♦', 'diamonds', 'red', 'NP'),
-	(20, 7, 'seven', '7', '♦', 'diamonds', 'red', 'NP'),
-	(21, 8, 'eight', '8', '♦', 'diamonds', 'red', 'NP'),
-	(22, 9, 'nine', '9', '♦', 'diamonds', 'red', 'NP'),
-	(23, 10, 'ten', '10', '♦', 'diamonds', 'red', 'NP'),
-	(24, 11, 'jack', 'J', '♦', 'diamonds', 'red', 'NP'),
-	(25, 12, 'queen', 'Q', '♦', 'diamonds', 'red', 'NP'),
-	(26, 13, 'king', 'K', '♦', 'diamonds', 'red', 'NP'),
-	(27, 1, 'ace', 'A', '♣', 'clubs', 'black', 'NP'),
-	(28, 2, 'two', '2', '♣', 'clubs', 'black', 'NP'),
-	(29, 3, 'three', '3', '♣', 'clubs', 'black', 'NP'),
-	(30, 4, 'four', '4', '♣', 'clubs', 'black', 'NP'),
-	(31, 5, 'five', '5', '♣', 'clubs', 'black', 'NP'),
-	(32, 6, 'six', '6', '♣', 'clubs', 'black', 'NP'),
-	(33, 7, 'seven', '7', '♣', 'clubs', 'black', 'NP'),
-	(34, 8, 'eight', '8', '♣', 'clubs', 'black', 'NP'),
-	(35, 9, 'nine', '9', '♣', 'clubs', 'black', 'NP'),
-	(36, 10, 'ten', '10', '♣', 'clubs', 'black', 'NP'),
-	(37, 11, 'jack', 'J', '♣', 'clubs', 'black', 'NP'),
-	(38, 12, 'queen', 'Q', '♣', 'clubs', 'black', 'NP'),
-	(39, 13, 'king', 'K', '♣', 'clubs', 'black', 'NP'),
-	(40, 1, 'ace', 'A', '♠', 'spades', 'black', 'NP'),
-	(41, 2, 'two', '2', '♠', 'spades', 'black', 'NP'),
-	(42, 3, 'three', '3', '♠', 'spades', 'black', 'NP'),
-	(43, 4, 'four', '4', '♠', 'spades', 'black', 'NP'),
-	(44, 5, 'five', '5', '♠', 'spades', 'black', 'NP'),
-	(45, 6, 'six', '6', '♠', 'spades', 'black', 'NP'),
-	(46, 7, 'seven', '7', '♠', 'spades', 'black', 'NP'),
-	(47, 8, 'eight', '8', '♠', 'spades', 'black', 'NP'),
-	(48, 9, 'nine', '9', '♠', 'spades', 'black', 'NP'),
-	(49, 10, 'ten', '10', '♠', 'spades', 'black', 'NP'),
-	(50, 11, 'jack', 'J', '♠', 'spades', 'black', 'NP'),
-	(51, 12, 'queen', 'Q', '♠', 'spades', 'black', 'NP'),
-	(52, 13, 'king', 'K', '♠', 'spades', 'black', 'NP');
+INSERT INTO `playcards` (`id`, `value_tinyinit`, `value_text`, `value_symbol`, `suit_symbol`, `suit_text`, `suit_color`, `player_us`, `turn_name`) VALUES
+	(1, 1, 'ace', 'A', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(2, 2, 'two', '2', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(3, 3, 'three', '3', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(4, 4, 'four', '4', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(5, 5, 'five', '5', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(6, 6, 'six', '6', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(7, 7, 'seven', '7', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(8, 8, 'eight', '8', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(9, 9, 'nine', '9', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(10, 10, 'ten', '10', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(11, 11, 'jack', 'J', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(12, 12, 'queen', 'Q', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(13, 13, 'king', 'K', '♥', 'hearts', 'red', 'NP', 'NTN'),
+	(14, 1, 'ace', 'A', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(15, 2, 'two', '2', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(16, 3, 'three', '3', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(17, 4, 'four', '4', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(18, 5, 'five', '5', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(19, 6, 'six', '6', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(20, 7, 'seven', '7', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(21, 8, 'eight', '8', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(22, 9, 'nine', '9', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(23, 10, 'ten', '10', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(24, 11, 'jack', 'J', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(25, 12, 'queen', 'Q', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(26, 13, 'king', 'K', '♦', 'diamonds', 'red', 'NP', 'NTN'),
+	(27, 1, 'ace', 'A', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(28, 2, 'two', '2', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(29, 3, 'three', '3', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(30, 4, 'four', '4', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(31, 5, 'five', '5', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(32, 6, 'six', '6', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(33, 7, 'seven', '7', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(34, 8, 'eight', '8', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(35, 9, 'nine', '9', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(36, 10, 'ten', '10', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(37, 11, 'jack', 'J', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(38, 12, 'queen', 'Q', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(39, 13, 'king', 'K', '♣', 'clubs', 'black', 'NP', 'NTN'),
+	(40, 1, 'ace', 'A', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(41, 2, 'two', '2', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(42, 3, 'three', '3', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(43, 4, 'four', '4', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(44, 5, 'five', '5', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(45, 6, 'six', '6', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(46, 7, 'seven', '7', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(47, 8, 'eight', '8', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(48, 9, 'nine', '9', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(49, 10, 'ten', '10', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(50, 11, 'jack', 'J', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(51, 12, 'queen', 'Q', '♠', 'spades', 'black', 'NP', 'NTN'),
+	(52, 13, 'king', 'K', '♠', 'spades', 'black', 'NP', 'NTN');
 /*!40000 ALTER TABLE `playcards` ENABLE KEYS */;
 
 -- Dumping structure for table bluff.players
@@ -244,14 +247,16 @@ DROP TABLE IF EXISTS `players`;
 CREATE TABLE IF NOT EXISTS `players` (
   `username` mediumtext DEFAULT NULL,
   `token` varchar(100) DEFAULT NULL,
-  KEY `username` (`username`(1024))
+  `turn_name` enum('A','B') NOT NULL,
+  `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`turn_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table bluff.players: ~2 rows (approximately)
 /*!40000 ALTER TABLE `players` DISABLE KEYS */;
-INSERT INTO `players` (`username`, `token`) VALUES
-	('thanos', 'sdvsdvbsdv'),
-	('takis', 'dfghfdghjs');
+INSERT INTO `players` (`username`, `token`, `turn_name`, `last_action`) VALUES
+	('hdfloskjdhjf', '0e81cf13900ae8018c66a76776ba55be', 'A', '2022-12-13 13:12:15'),
+	('tnschr', '52cc4432ac68f00e5138e9c36e829661', 'B', '2022-12-13 13:12:05');
 /*!40000 ALTER TABLE `players` ENABLE KEYS */;
 
 -- Dumping structure for procedure bluff.share_1st_player
@@ -259,18 +264,16 @@ DROP PROCEDURE IF EXISTS `share_1st_player`;
 DELIMITER //
 CREATE PROCEDURE `share_1st_player`()
 BEGIN
-DECLARE p1 MEDIUMTEXT;
+DECLARE p1, p2 MEDIUMTEXT;
 
-SELECT username INTO p1
+SELECT username, turn_name INTO p1, p2
 FROM players LIMIT 1;
 
 UPDATE hands
-SET player_us = p1
+SET player_us = p1, turn_name = p2
 ORDER BY RAND() LIMIT 26;
 
-
-CALL share_2nd_player;
-
+CALL share_2nd_player();
 
 END//
 DELIMITER ;
@@ -280,13 +283,13 @@ DROP PROCEDURE IF EXISTS `share_2nd_player`;
 DELIMITER //
 CREATE PROCEDURE `share_2nd_player`()
 BEGIN
-DECLARE  p2 MEDIUMTEXT;
+DECLARE  p3, p4 MEDIUMTEXT;
 
-SELECT username INTO p2
+SELECT username, turn_name INTO p3, p4
 FROM players LIMIT 1 OFFSET 1;
 
 UPDATE hands
-SET player_us = p2
+SET player_us = p3, turn_name = p4
 WHERE player_us = 'NP';
 END//
 DELIMITER ;
@@ -316,7 +319,6 @@ BEGIN
 DELETE FROM hands;
 INSERT INTO hands
 SELECT * FROM playcards;
-CALL share_1st_player();
 END//
 DELIMITER ;
 
