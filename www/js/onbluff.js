@@ -12,7 +12,6 @@ $(function(){
 })
 
 
-
     function login_to_game() {
         if($('#username').val()=='') {
         alert('You have to set a username');
@@ -106,7 +105,7 @@ $(function(){
         //         fill_board();
         //     }
         //     $('#move_div').show(1000);
-        //     timer=setTimeout(function() { game_status_update();}, 15000);
+            //  timer=setTimeout(function() { game_status_update();}, 15000);
         // } else {
         //     // must wait for something
         //     $('#move_div').hide(1000);
