@@ -59,20 +59,21 @@ $(function(){
          update_info();
     }
 
-    function reveal_cards(){
-        for (var j = 1; j < my_cards.length; j++){
-            $('#my_hand').append('<img width="100" height="150" src= "'+my_cards[j].img+'"/>');
-        }
-       
-    }
-
-    // function reveal_cards() {
-    //     var html = "";
-    //     for (var j = 0; j <= my_cards.length; j++){
-    //         html += '<img width="100" height="150" src= "'+my_cards[j].img+'"/>';
+    // function reveal_cards(){
+    //     for (var j = 1; j < my_cards.length; j++){
+    //         $('#my_hand').append('<img width="100" height="150" src= "'+my_cards[j].img+'"/>');
     //     }
-    //     $('#my_hand').html(html);
+       
     // }
+
+    function reveal_cards() {
+        var html = "";
+        for (var j = 0; j <= my_cards.length; j++){
+            html += '<img width="100" height="150" src= "'+my_cards[j].img+'"/>';
+        }
+        $('#my_hand').html(html);
+    }
+   
 
     function update_info(){
         $('#game_info').html("I am Player: "+me.turn_name +", my name is "+me.username +'<br>Token='+me.token+'<br>Game state: '+game_status.status+', '+ game_status.p_turn+' must play now.');
