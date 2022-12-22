@@ -18,7 +18,7 @@ switch ($r=array_shift($request)) {
         case '':
         case null: handle_board($method);
         break;
-        case 'piece': handle_piece($method, $request[0],$request[1],$input);
+        case 'card': handle_card($method, $request[0],$request[1]);
                     break;
         default: header("HTTP/1.1 404 Not Found");
                     break;
@@ -63,12 +63,17 @@ function handle_hands($method, $c, $input){
             default: header("HTTP/1,1 404 Not Found");
             print json_encode(['errormesg' => "Something's wrong"]);
             break;
-
+            show_hands($c);
     }
 }
 
 
-function handle_piece($method, $x,$y,$input){
+function handle_card($method, $name,$c){
+    if ($method=='PUT'){
+        throw_card($name,$c);
+    } else if ($method=='GET'){
+
+    }
     ;
 }
 

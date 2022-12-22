@@ -1,5 +1,20 @@
 <?php
 
+
+function throw_card($name,$c){
+	do_throw($name,$c);
+}
+
+function do_throw($name,$c){
+	global $mysqli;
+	$sql = 'call throw_card (?,?)';
+	$st = $mysqli->prepare($sql);
+	$st->bind_param('si',$name,$c);
+	$st->execute();
+
+	show_game_board();
+}
+
 function show_game_status(){
     global $mysqli;
 
