@@ -20,6 +20,8 @@ switch ($r=array_shift($request)) {
         break;
         case 'card': handle_card($method, $request[0],$request[1]);
                     break;
+        case 'bluff': handle_bluff($method, $request[0]);
+                    break;
         default: header("HTTP/1.1 404 Not Found");
                     break;
 
@@ -71,6 +73,15 @@ function handle_hands($method, $c, $input){
 function handle_card($method, $name,$c){
     if ($method=='PUT'){
         throw_card($name,$c);
+    } else if ($method=='GET'){
+
+    }
+    ;
+}
+
+function handle_bluff($method, $uname){
+    if ($method=='PUT'){
+        take_back($uname);
     } else if ($method=='GET'){
 
     }
