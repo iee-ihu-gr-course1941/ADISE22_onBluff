@@ -11,13 +11,13 @@ function do_take_back($uname){
 	$st->bind_param('s',$uname);
 	$st->execute();
 
-	$sql2 = 'select turn_name from players where username=?';
-	$st2 = $mysqli->prepare($sql2);
-	$st2->bind_param('s',$uname);
-	$st2->execute();
-	$res = $st2->get_result();
+	// $sql2 = 'select turn_name from players where username=?';
+	// $st2 = $mysqli->prepare($sql2);
+	// $st2->bind_param('s',$uname);
+	// $st2->execute();
+	// $res = $st2->get_result();
 	
-	 show_hands($res);
+	//  show_hands($res);
 
 }
 
