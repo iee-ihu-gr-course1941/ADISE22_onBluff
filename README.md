@@ -77,7 +77,7 @@ Table of Contents
 
 ## Methods
 
-### Card
+### Game Board
 
 #### Εμφάνιση τραπεζιού
 
