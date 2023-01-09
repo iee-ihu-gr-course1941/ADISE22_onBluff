@@ -12,12 +12,12 @@ Table of Contents
         * [Card](#card)
         * [GameTable](#GameTable)
         * [Players](#player)
-        * [GameCondition](#gamecondition)
-        * [CheckBluff](#checkbluff)          
-    * [Entities](#entities)
+        * [GameCondition](#gamecondition)          
+   	 * [Entities](#entities)
         * [game_board](#game_board)
         * [players](#players)
         * [game_status](#game_status)
+        * [hands](#hands)
           
 
 
