@@ -15,11 +15,10 @@ Table of Contents
         * [GameCondition](#gamecondition)
         * [CheckBluff](#checkbluff)          
     * [Entities](#entities)
-        * [cards](#cards)
-        * [game_table](#game_table)
+        * [game_board](#game_board)
         * [players](#players)
-        * [game_condition](#game_condition)
-        * [check_bluff](#check_bluff)    
+        * [game_status](#game_status)
+          
 
 
 
